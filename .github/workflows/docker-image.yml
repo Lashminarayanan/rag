@@ -33,7 +33,7 @@ jobs:
           context: ./offline-financial-rag-mvp
           file: ./offline-financial-rag-mvp/backend-enterprise/Dockerfile
           push: true
-          tags: ghcr.io/bkls/financial-rag-backend:latest
+          tags: ghcr.io/lashminarayanan/financial-rag-backend:latest
 
       - name: Build & push frontend
         uses: docker/build-push-action@v5
