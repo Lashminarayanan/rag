@@ -1,0 +1,145 @@
+services:
+  # ── GPU: vLLM LLM Server ──────────────────────────────────
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: financial-rag-vllm
+    restart: unless-stopped
+    ipc: host
+    command: >-
+      --model ${VLLM_MODEL:-Qwen/Qwen2.5-7B-Instruct}
+      --port 8000
+      --max-model-len ${VLLM_MAX_MODEL_LEN:-8192}
+      --gpu-memory-utilization ${VLLM_GPU_MEM_UTIL:-0.92}
+      --dtype half
+      --trust-remote-code
+      --enforce-eager
+    ports:
+      - "8000:8000"
+    volumes:
+      - model-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 120          # model load can take minutes
+      start_period: 300s
+
+  # ── CPU: Embedding Microservice ────────────────────────────
+  embeddings:
+    build:
+      context: ./rag
+      dockerfile: Dockerfile.embeddings
+    container_name: financial-rag-embeddings
+    restart: unless-stopped
+    environment:
+      - EMBEDDING_MODEL_NAME=${EMBEDDING_MODEL_NAME:-nomic-ai/nomic-embed-text-v1.5}
+    ports:
+      - "8001:8001"
+    volumes:
+      - model-cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+
+  # ── Database: PostgreSQL + pgvector ────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: financial-rag-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-financial_rag}
+      POSTGRES_USER: ${POSTGRES_USER:-rag_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rag_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rag_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Backend API (Node.js + Python RAG worker) ──────────────
+  backend:
+    build:
+      context: .
+      dockerfile: backend-enterprise/Dockerfile
+    container_name: financial-rag-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      vllm:
+        condition: service_healthy
+      embeddings:
+        condition: service_healthy
+    environment:
+      - LLM_BACKEND=vllm
+      - VLLM_BASE_URL=http://vllm:8000
+      - VLLM_MODEL=${VLLM_MODEL:-Qwen/Qwen2.5-7B-Instruct}
+      - EMBEDDING_API_URL=http://embeddings:8001
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-financial_rag}
+      - POSTGRES_USER=${POSTGRES_USER:-rag_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-rag_pass}
+      - BACKEND_PORT=8080
+      - PYTHON_QUERY_WORKER=python3
+      - RAG_PYTHON_ENTRY=/app/rag/app/query_worker.py
+    ports:
+      - "8080:8080"
+
+  # ── Frontend (React + Nginx) ───────────────────────────────
+  frontend:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ""
+    container_name: financial-rag-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+
+  # ── One-shot: ingest PDF reports ───────────────────────────
+  # Usage:  docker compose -f docker-compose.gpu.yml --profile ingest run --rm ingest
+  ingest:
+    build:
+      context: ./rag
+      dockerfile: Dockerfile
+    container_name: financial-rag-ingest
+    depends_on:
+      postgres:
+        condition: service_healthy
+      embeddings:
+        condition: service_healthy
+    environment:
+      - LLM_BACKEND=vllm
+      - EMBEDDING_API_URL=http://embeddings:8001
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-financial_rag}
+      - POSTGRES_USER=${POSTGRES_USER:-rag_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-rag_pass}
+    volumes:
+      - ./sample_data/reports:/data/reports:ro
+    profiles:
+      - ingest
+
+volumes:
+  pgdata:
+  model-cache:

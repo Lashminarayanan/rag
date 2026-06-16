@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install PyTorch CPU-only build (keeps image ~1 GB smaller)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+COPY requirements.embeddings.txt .
+RUN pip install --no-cache-dir -r requirements.embeddings.txt
+
+COPY embedding_service.py .
+
+EXPOSE 8001
+CMD ["uvicorn", "embedding_service:app", "--host", "0.0.0.0", "--port", "8001"]

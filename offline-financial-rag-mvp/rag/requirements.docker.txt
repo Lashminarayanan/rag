@@ -1,0 +1,8 @@
+# Slim requirements for Docker (no docling / streamlit)
+langgraph>=0.2.34
+langchain-core>=0.3.0
+psycopg[binary]>=3.2.1
+python-dotenv>=1.0.1
+requests>=2.32.3
+pypdf>=5.0.0
+pydantic>=2.8.2
