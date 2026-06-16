@@ -35,13 +35,13 @@ jobs:
           push: true
           tags: ghcr.io/lashminarayanan/financial-rag-backend:latest
 
-      - name: Build & push frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./offline-financial-rag-mvp
-          file: ./offline-financial-rag-mvp/frontend-react/Dockerfile
-          push: true
-          tags: ghcr.io/lashminarayanan/financial-rag-frontend:latest
+      #- name: Build & push frontend
+      #  uses: docker/build-push-action@v5
+      #  with:
+      #    context: ./offline-financial-rag-mvp
+      #    file: ./offline-financial-rag-mvp/frontend-react/Dockerfile
+      #    push: true
+      #    tags: ghcr.io/lashminarayanan/financial-rag-frontend:latest
 
       - name: Build & push embeddings
         uses: docker/build-push-action@v5
