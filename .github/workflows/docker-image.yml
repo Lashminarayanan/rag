@@ -30,8 +30,8 @@ jobs:
       - name: Build & push backend
         uses: docker/build-push-action@v5
         with:
-          context: ./offline-financial-rag-mvp
-          file: backend-enterprise/Dockerfile
+          context: ./offline-financial-rag-mvp/backend-enterprise
+          file: Dockerfile
           push: true
           tags: ghcr.io/bkls/financial-rag-backend:latest
 
