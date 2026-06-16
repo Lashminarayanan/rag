@@ -31,7 +31,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./offline-financial-rag-mvp/backend-enterprise
-          file: Dockerfile
+          file: ./offline-financial-rag-mvp/backend-enterprise/Dockerfile
           push: true
           tags: ghcr.io/bkls/financial-rag-backend:latest
 
@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./offline-financial-rag-mvp/frontend-react
-          file: frontend-react/Dockerfile
+          file: ./offline-financial-rag-mvp/frontend-react/Dockerfile
           push: true
           tags: ghcr.io/bkls/financial-rag-frontend:latest
 
@@ -47,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./offline-financial-rag-mvp/rag
-          file: rag/Dockerfile.embeddings
+          file: ./offline-financial-rag-mvp/rag/Dockerfile.embeddings
           push: true
           tags: ghcr.io/bkls/financial-rag-embeddings:latest
 
@@ -55,6 +55,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./offline-financial-rag-mvp/rag
-          file: rag/Dockerfile
+          file: ./offline-financial-rag-mvp/rag/Dockerfile
           push: true
           tags: ghcr.io/bkls/financial-rag-ingest:latest
