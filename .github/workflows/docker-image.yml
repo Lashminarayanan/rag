@@ -38,23 +38,23 @@ jobs:
       - name: Build & push frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./offline-financial-rag-mvp/frontend-react
+          context: ./offline-financial-rag-mvp
           file: ./offline-financial-rag-mvp/frontend-react/Dockerfile
           push: true
-          tags: ghcr.io/bkls/financial-rag-frontend:latest
+          tags: ghcr.io/lashminarayanan/financial-rag-frontend:latest
 
       - name: Build & push embeddings
         uses: docker/build-push-action@v5
         with:
-          context: ./offline-financial-rag-mvp/rag
+          context: ./offline-financial-rag-mvp
           file: ./offline-financial-rag-mvp/rag/Dockerfile.embeddings
           push: true
-          tags: ghcr.io/bkls/financial-rag-embeddings:latest
+          tags: ghcr.io/lashminarayanan/financial-rag-embeddings:latest
 
       - name: Build & push ingest
         uses: docker/build-push-action@v5
         with:
-          context: ./offline-financial-rag-mvp/rag
+          context: ./offline-financial-rag-mvp
           file: ./offline-financial-rag-mvp/rag/Dockerfile
           push: true
-          tags: ghcr.io/bkls/financial-rag-ingest:latest
+          tags: ghcr.io/lashminarayanan/financial-rag-ingest:latest
