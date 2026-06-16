@@ -33,7 +33,7 @@ jobs:
           context: .
           file: backend-enterprise/Dockerfile
           push: true
-          tags: ghcr.io/${{ env.OWNER }}/financial-rag-backend:latest
+          tags: ghcr.io/${{ toLowerCase(env.OWNER) }}/financial-rag-backend:latest
 
       - name: Build & push frontend
         uses: docker/build-push-action@v5
@@ -41,7 +41,7 @@ jobs:
           context: ./frontend-react
           file: frontend-react/Dockerfile
           push: true
-          tags: ghcr.io/${{ env.OWNER }}/financial-rag-frontend:latest
+          tags: ghcr.io/${{ toLowerCase(env.OWNER) }}/financial-rag-frontend:latest
 
       - name: Build & push embeddings
         uses: docker/build-push-action@v5
@@ -49,7 +49,7 @@ jobs:
           context: ./rag
           file: rag/Dockerfile.embeddings
           push: true
-          tags: ghcr.io/${{ env.OWNER }}/financial-rag-embeddings:latest
+          tags: ghcr.io/${{ toLowerCase(env.OWNER) }}/financial-rag-embeddings:latest
 
       - name: Build & push ingest
         uses: docker/build-push-action@v5
@@ -57,4 +57,4 @@ jobs:
           context: ./rag
           file: rag/Dockerfile
           push: true
-          tags: ghcr.io/${{ env.OWNER }}/financial-rag-ingest:latest
+          tags: ghcr.io/${{ toLowerCase(env.OWNER) }}/financial-rag-ingest:latest
