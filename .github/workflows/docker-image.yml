@@ -30,31 +30,31 @@ jobs:
       - name: Build & push backend
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: offline-financial-rag-mvp/backend-enterprise/Dockerfile
+          context: ./offline-financial-rag-mvp
+          file: backend-enterprise/Dockerfile
           push: true
           tags: ghcr.io/bkls/financial-rag-backend:latest
 
       - name: Build & push frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend-react
-          file: offline-financial-rag-mvp/frontend-react/Dockerfile
+          context: ./offline-financial-rag-mvp/frontend-react
+          file: frontend-react/Dockerfile
           push: true
           tags: ghcr.io/bkls/financial-rag-frontend:latest
 
       - name: Build & push embeddings
         uses: docker/build-push-action@v5
         with:
-          context: ./rag
-          file: offline-financial-rag-mvp/rag/Dockerfile.embeddings
+          context: ./offline-financial-rag-mvp/rag
+          file: rag/Dockerfile.embeddings
           push: true
           tags: ghcr.io/bkls/financial-rag-embeddings:latest
 
       - name: Build & push ingest
         uses: docker/build-push-action@v5
         with:
-          context: ./rag
-          file: offline-financial-rag-mvp/rag/Dockerfile
+          context: ./offline-financial-rag-mvp/rag
+          file: rag/Dockerfile
           push: true
           tags: ghcr.io/bkls/financial-rag-ingest:latest
