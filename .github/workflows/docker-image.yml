@@ -46,7 +46,7 @@ jobs:
       - name: Build & push embeddings
         uses: docker/build-push-action@v5
         with:
-          context: ./offline-financial-rag-mvp
+          context: ./offline-financial-rag-mvp/rag
           file: ./offline-financial-rag-mvp/rag/Dockerfile.embeddings
           push: true
           tags: ghcr.io/lashminarayanan/financial-rag-embeddings:latest
@@ -54,7 +54,7 @@ jobs:
       - name: Build & push ingest
         uses: docker/build-push-action@v5
         with:
-          context: ./offline-financial-rag-mvp
+          context: ./offline-financial-rag-mvp/rag
           file: ./offline-financial-rag-mvp/rag/Dockerfile
           push: true
           tags: ghcr.io/lashminarayanan/financial-rag-ingest:latest
