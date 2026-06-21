@@ -101,7 +101,7 @@ services:
     ports:
       - "8080:8080"
 
-  # ── Frontend (React + Nginx) ───────────────────────────────
+  # ── Frontend (React + Node) ───────────────────────────────
   frontend:
     build:
       context: ./frontend-react
@@ -113,7 +113,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "${FRONTEND_PORT:-3000}:80"
+      - "${FRONTEND_PORT:-3000}:3000"
 
   # ── One-shot: ingest PDF reports ───────────────────────────
   # Usage:  docker compose -f docker-compose.gpu.yml --profile ingest run --rm ingest
